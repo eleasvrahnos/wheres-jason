@@ -1,0 +1,21 @@
+{% extends "layout.html" %}
+{% block content %}
+  <div class="background">
+    <div class="fullbg">
+      <img src="static/fullbg.jpg">
+    </div>
+    <div class="bgvideo">
+      <video width="100%" height="auto" controls>
+        <source src="static/happy.mp4" type="video/mp4">
+      </video>
+    </div>
+  </div>
+  <div class="selection-screen">
+      <a href="play" class="button play-button">Play</a>
+      <a href="how-to-play" class="button sub-button">How To Play</a>
+      <a href="leaderboards" class="button sub-button">Leaderboards</a>
+  </div>
+  <div class="creator-credit">
+    Website created by Eleas Vrahnos
+  </div>
+{% endblock content %}

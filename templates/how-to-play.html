@@ -1,0 +1,78 @@
+{% extends "layout.html" %}
+{% block content %}
+  <div class="fullbg">
+    <img src="static/fullbg.jpg">
+  </div>
+  <div>
+    <a href="home" class="button back-button" id="back">Back to Home</a>
+  </div>
+  <div class="main_HTP">
+    <div class="title_jmh">
+      HOW TO PLAY
+    </div>
+    <div class="contents">
+      <div class="tab">
+        <button class="tablinks" onclick="openCategory(event, 'About Where\'s Jaosn')">About Where's Jaosn</button>
+        <button class="tablinks" onclick="openCategory(event, 'How To Play')">How To Play</button>
+        <button class="tablinks" onclick="openCategory(event, 'Menu Button')">Menu Button</button>
+      </div>
+
+      <!-- Tab content -->
+      <div id="About Where's Jaosn" class="tabcontent">
+        <h3 style="font-size:40px; text-align:center;">About Where's Jaosn</h3> <p></p>
+        <p style="font-size:25px;">Where's Jaosn?™ is a game similar to "Where's Waldo?" by Martin Handford. This website was made originally as a coding challenge, as I have never made a website before. This is why I started it 6 months before its release, before college took up my time. I learned as much as I could during my free time, and what I was able to put together is this final product.</p>
+        <p style="font-size:25px;">This acts as both a Christmas present, as well as a birthday gift for Jaosn (real name Jason), a long-time friend of mine. This game started off as a small joke by him, but I have decided to make it the focus of my project, to make it both fun and informative.</p>
+        <p style="font-size:25px;">Massive thanks to @DutChen18#7605 for helping me through this process of making a website from scratch, I couldn't have done it without him. I hope you enjoy my first ever long-scale website project of Where's Jaosn!.</p>
+        <p style="text-align:center;"><img style="height:120px; text-align:center;" src="static/jaosnTransparentBG.png">
+      </div>
+      <div id="How To Play" class="tabcontent">
+        <h3 style="font-size:40px; text-align:center;">How To Play</h3>
+        <div id="howtoplayvidtext">
+          <video width="550" height="292" style="float:left; top:20px;" playsinline autoplay muted loop>
+            <source src="static/howtoplayex.mp4" type="video/mp4">
+          </video>
+          <div>
+            <p style="font-size:25px; margin-left: 20px;"> You start with 3 lives. A countdown will start before the reveal of each randomly-generated image.</p>
+            <p style="font-size:25px; margin-left: 20px;"> You have 60 seconds to find Jaosn within the given image. Jaosn's reference image is seen in the example at left, as well as within the Where's Jaosn logo above. When you find Jaosn, click him and you will be awarded points based on how fast you found him (maximum points per round is 1000). Clicking the wrong place or running out of time will subtract 1 life. Lose all 3 lives and the game is over.</p>
+            <p style="font-size:25px; margin-left: 20px;"> Each image with Jaosn is truly randomly-generated, meaning that Jaosn can be in an easy image, a hard image, an easy spot, a hard spot, etc. This means that difficulty will vary throughout the game, and luck will vary from round to round.</p>
+            <p style="font-size:25px; margin-left: 20px;"> Your total points will be tracked and placed on the leaderboard after the game. Climb the ranks to reach #1!</p>
+          </div>
+        </div>
+      </div>
+      <div id="Menu Button" class="tabcontent">
+        <h3 style="font-size:40px; text-align:center;">Menu Button</h3>
+        <div id="menubuttontext">
+          <video width="550" height="292" style="float:left;" playsinline autoplay muted loop>
+            <source src="static/menuex.mp4" type="video/mp4">
+          </video>
+          <div>
+            <p style="font-size:25px; margin-left: 20px;"> The menu can be found by clicking the timer at the top of the page.</p>
+            <p style="font-size:25px; margin-left: 20px;"> On the left are the red hearts that shows your current lives in the game. Next to those are volume sliders for the background music and the sound effects volume respectively. These sliders will be saved between each playthrough so you don't have to adjust them again.</p>
+            <p style="font-size:25px; margin-left: 20px;"> On the right are the current number of points you have accumulated in the game so far, and a 'Back to Home' button. There is no limit to how many points you can earn. Clicking the 'Back to Home' button will take you back to the homepage, so use this to exit the game.</p>
+            <p style="font-size:25px; margin-left: 20px;"> NOTE: Please try and limit usage of the forward/back/refresh navigation buttons and use the buttons given on the website instead. Some settings/scores may not be saved if using the navigation buttons.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script>
+    const back = document.getElementById("back");
+    back.style.width = Math.round(0.144 * window.innerWidth) + "px";
+    back.style.left = Math.round(0.0555 * window.innerWidth) + "px";
+    back.style.top = Math.round(0.0509 * window.innerHeight) + "px";
+
+    function openCategory(evt, categoryName) {
+      var i, tabcontent, tablinks;
+      tabcontent = document.getElementsByClassName("tabcontent");
+      for (i = 0; i < tabcontent.length; i++) {
+        tabcontent[i].style.display = "none";
+      }
+      tablinks = document.getElementsByClassName("tablinks");
+      for (i = 0; i < tablinks.length; i++) {
+        tablinks[i].className = tablinks[i].className.replace(" active", "");
+      }
+      document.getElementById(categoryName).style.display = "block";
+      evt.currentTarget.className += " active";
+    }
+  </script>
+{% endblock content %}

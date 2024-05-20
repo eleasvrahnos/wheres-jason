@@ -1,0 +1,605 @@
+{% extends "layout.html" %}
+{% block content %}
+  <div class="fullbg" id="bg">
+    <img src="static/fullbg.jpg">
+  </div>
+  <div class="main_PLAY" id="main_PLAY" position='absolute'>
+    <div>
+      <a href="home" class="button back-button" id="back">Back to Home</a>
+    </div>
+    <div class="play-screen" id="playscreen">
+      <button onclick="fullscreen()" id="start" class="start-button">START</button>
+    </div>
+    <div id="menu">
+      <div id="menu-content">
+        <div id="leftside">
+          <img src="/static/3lives.png" id="life-counter" style="float: left">
+          <div id="firstvol">
+            <input id="vol-control" type="range" min="0" max="100" step="1" oninput="setBGVolume(this.value)" onchange="setBGVolume(this.value)"></input>
+            Background
+          </div>
+          <div id="secondvol">
+            <input id="vol-control-2" type="range" min="0" max="100" step="1" oninput="setSFXVolume(this.value)" onchange="setSFXVolume(this.value)"></input>
+            SFX
+          </div>
+        </div>
+        <div id="rightside">
+          <div id="point-counter"> 0 </div>
+          <a href="home" class="button back-home" id="back" style="border-radius:0px; margin:0px;" onclick="saveVolumeSettings()">Back to Home</a>
+        </div>
+        <audio id="bgmusic" src="" type="audio/wav"></audio>
+      </div>
+      <button class="60" id="menu-collapse"></button>
+    </div>
+    <div id="congrats-points">
+      <div id="congrats"> You found Jaosn! </div>
+      <div id="points-earned"> Points Earned: </div>
+      <div id="total-points"> Total Points: </div>
+    </div>
+    <div id="submit-score">
+      <img id="jaosngameover" style="float: center">
+      <div id="blnt"> Better luck next time! </div>
+      <div id="finalscore" style="font-size:30px;"> Score: </div>
+      <form action="{{ url_for('leaderboards') }}" method="post" target="_self">
+        <div id="userheader">Username (no spaces):</div>
+        <input type="text" id="username-field" name="username" value="" maxlength="20"><br>
+        <input type="submit" id="submitusername" value="Submit" onClick="return noSpacesCheck()" />
+      </form>
+    </div>
+  </div>
+  <audio id="countdowntick" src="/static/countdowntick.wav" type="audio/wav"></audio>
+  <audio id="starttick" src="/static/starttick.wav" type="audio/wav"></audio>
+  <audio id="winsound" src="/static/winsound.wav" type="audio/wav"></audio>
+  <audio id="pointtick" src="/static/pointtick.wav" type="audio/wav"></audio>
+  <audio id="loselifesound" src="/static/loselifesound.wav" type="audio/wav"></audio>
+
+  <script>
+
+  window.onload = function() {
+    let getVols = new XMLHttpRequest();
+    getVols.open("GET", "/get-volume-states", true);
+    getVols.onload = function() {
+      const vols = JSON.parse(getVols.responseText);
+      bgmusic.volume = vols.bgVol;
+      countdowntick.volume = vols.sfxVol;
+      starttick.volume = vols.sfxVol;
+      winsound.volume = vols.sfxVol;
+      pointtick.volume = vols.sfxVol;
+      loselifesound.volume = vols.sfxVol;
+      const volcontrol = document.getElementById("vol-control");
+      volcontrol.value = vols.bgVol * 100;
+      const volcontrol2 = document.getElementById("vol-control-2");
+      volcontrol2.value = vols.sfxVol * 100;
+    }
+    getVols.send();
+  }
+
+  const back = document.getElementById("back");
+  back.style.width = "300px";
+  back.style.left = Math.round(0.01 * window.innerWidth) + "px";
+  back.style.top = Math.round(0.005 * window.innerHeight) + "px";
+
+  const playscreen = document.getElementById("playscreen");
+  playscreen.style.top = Math.round(0.14 * window.innerHeight) + "px";
+  playscreen.style.bottom = Math.round(0.02 * window.innerHeight) + "px";
+  const startbutton = document.getElementById("start");
+  startbutton.style.top = Math.round(0.31956 * window.innerHeight) + "px";
+  const elem = document.getElementById("playscreen");
+  const submitscore = document.getElementById("submit-score");
+  submitscore.style.top = Math.round(0.075 * window.innerHeight) + "px";
+
+  let start = true;
+  let end = false;
+  let track2ago = 0;
+  let track1ago = 0;
+
+  function sleep(ms) {
+    // Program waits for a given amount of milliseconds
+    return new Promise(resolve => setTimeout(resolve, ms));
+  }
+
+  async function fullscreen() {
+    const submitscore = document.getElementById("submit-score");
+    submitscore.style.display = "flex";
+    const congratspoints = document.getElementById("congrats-points");
+    congratspoints.style.display = "flex";
+    // Reveals collapsible menu
+    const menu = document.getElementById("menu");
+    menu.classList.toggle("visible");
+    // Makes collapsibility possible when the arrow is clicked
+    const menuCollapse = document.getElementById("menu-collapse");
+    menuCollapse.addEventListener("click", function() {
+      menu.classList.toggle("active");
+    });
+    // Makes the play screen fullscreen
+    elem.style.height = "100%";
+    elem.style.top = "0px";
+    elem.style.margin = "0px";
+    playBGMusicPlayer();
+    // Game is prepared with image creation and countdown
+    await nextImagePrep("start");
+  }
+
+  async function countdown() {
+    // Screen counts down from 3 to 1
+    elem.style.fontFamily = "pressstart2p";
+    document.getElementById("menu-collapse").setAttribute('class', '60');
+    elem.innerHTML = "3";
+    countdowntick.play();
+    await sleep(1000);
+    elem.innerHTML = "2";
+    countdowntick.play();
+    await sleep(1000);
+    elem.innerHTML = "1";
+    countdowntick.play();
+    await sleep(1000);
+  }
+
+  function loadImage() {
+    return new Promise(function(resolve, reject) {
+      let reqImage = new XMLHttpRequest();
+      reqImage.open("GET", "/get-image", true);
+      reqImage.onload = function() {
+        resolve(reqImage.responseText);
+      };
+      reqImage.send();
+    });
+  }
+
+  async function prepImage() {
+    let loadImagePromise = loadImage();
+    let enc = await loadImagePromise;
+    return enc;
+  }
+
+  async function nextImagePrep(e) {
+    var encrypted;
+    let countdownPromise = countdown();
+    var combinedPromise;
+
+    if (e == "start") {
+      let imagePromise = prepImage();
+      combinedPromise = Promise.all([countdownPromise, imagePromise]);
+      let moveOn = await combinedPromise;
+      encrypted = moveOn[1];
+    }
+    else {
+      let moveOn = await countdownPromise;
+      encrypted = e;
+    }
+
+    let reqKeyIV = new XMLHttpRequest();
+    reqKeyIV.open("GET", "/get-key-iv", true);
+    reqKeyIV.onload = function() {
+      const keyivparse = JSON.parse(reqKeyIV.responseText);
+      let encryptedBytes = aesjs.utils.hex.toBytes(encrypted);
+      let byteKey = aesjs.utils.hex.toBytes(keyivparse.key);
+      let byteIV = aesjs.utils.hex.toBytes(keyivparse.iv);
+      let aesCbc = new aesjs.ModeOfOperation.cbc(byteKey, byteIV);
+      let decryptedBytes = aesCbc.decrypt(encryptedBytes);
+      gameStart(decryptedBytes);
+    };
+    reqKeyIV.send();
+  }
+
+  function gameStart(decrypted) {
+    const unscaledBG = new Image();
+    unscaledBG.onload = async function() {
+      starttick.play();
+
+      nextImageHex = prepImage();
+
+      let timer;
+      if (timer !== undefined)
+        return;
+      var num = 60;
+      timer = setInterval(function(){
+        num = num - 1;
+        document.getElementById("menu-collapse").setAttribute('class', num.toString());
+      }, 1000);
+
+
+      unscaledBGHeight = this.height;
+      unscaledBGWidth = this.width;
+      aspectRatio = unscaledBGHeight / unscaledBGWidth;
+
+      elem.replaceChildren(unscaledBG);
+      this.style.height = "100%";
+      this.style.width = "100%";
+      this.style.objectFit = "contain";
+
+
+      var x;
+      x = setTimeout(function(){
+        let timeout = new XMLHttpRequest();
+        timeout.open("POST", "/check", true);
+        timeout.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+        timeout.send("type=TIMEOUT");
+        timeout.onload = async function() {
+          clearInterval(timer);
+          const timeoutCheck = JSON.parse(timeout.responseText);
+          unscaledBG.removeEventListener("click", getClickPosition, false);
+          if (timeoutCheck.lives == "0") {
+            var scaledBGHeight;
+            var scaledBGWidth;
+            if ((aspectRatio * window.innerWidth) < window.innerHeight) {
+              scaledBGHeight = (unscaledBGHeight * window.innerWidth) / unscaledBGWidth;
+              scaledBGWidth = window.innerWidth;
+            }
+            else {
+              scaledBGHeight = window.innerHeight;
+              scaledBGWidth = (unscaledBGWidth * window.innerHeight) / unscaledBGHeight;
+            }
+            var fixedX = ((timeoutCheck.left * scaledBGWidth) / unscaledBGWidth) + (window.innerWidth/2 - scaledBGWidth/2);
+            var fixedY = ((timeoutCheck.top * scaledBGHeight) / unscaledBGHeight) + (window.innerHeight/2 - scaledBGHeight/2);
+            var fixedHeight = ((timeoutCheck.height * scaledBGHeight) / unscaledBGHeight);
+            var fixedWidth = ((timeoutCheck.width * scaledBGWidth) / unscaledBGWidth);
+            heartAnimation(window.innerWidth/2, window.innerHeight/2);
+            gameOver(fixedX, fixedY, fixedHeight, fixedWidth, unscaledBG);
+          }
+          else {
+            var scaledBGHeight;
+            var scaledBGWidth;
+            if ((aspectRatio * window.innerWidth) < window.innerHeight) {
+              scaledBGHeight = (unscaledBGHeight * window.innerWidth) / unscaledBGWidth;
+              scaledBGWidth = window.innerWidth;
+            }
+            else {
+              scaledBGHeight = window.innerHeight;
+              scaledBGWidth = (unscaledBGWidth * window.innerHeight) / unscaledBGHeight;
+            }
+            const jaosnImage = new Image();
+            jaosnImage.onload = async function() {
+              var fixedX = ((timeoutCheck.left * scaledBGWidth) / unscaledBGWidth) + (window.innerWidth/2 - scaledBGWidth/2);
+              var fixedY = ((timeoutCheck.top * scaledBGHeight) / unscaledBGHeight) + (window.innerHeight/2 - scaledBGHeight/2);
+              var fixedHeight = ((timeoutCheck.height * scaledBGHeight) / unscaledBGHeight);
+              var fixedWidth = ((timeoutCheck.width * scaledBGWidth) / unscaledBGWidth);
+
+              jaosnImage.style.top = fixedY + "px";
+              jaosnImage.style.left = fixedX + "px";
+              jaosnImage.style.height = fixedHeight + "px";
+              jaosnImage.style.width = fixedWidth + "px";
+              jaosnImage.style.position = "fixed";
+
+              elem.appendChild(jaosnImage);
+            }
+            jaosnImage.src = "/static/jaosnTransparentBG.png";
+            unscaledBG.style.transition = "0.25s";
+            unscaledBG.style.filter = "brightness(30%)";
+
+            heartAnimation(window.innerWidth/2, window.innerHeight/2);
+            await sleep(2500);
+
+            document.getElementById("life-counter").src = "/static/" + timeoutCheck.lives + "lives.png";
+            hex = await nextImageHex;
+            nextImagePrep(hex);
+          }
+        }
+      }, 60000);
+
+
+      unscaledBG.addEventListener("click", getClickPosition, false);
+      function getClickPosition(e) {
+        var scaledBGHeight;
+        var scaledBGWidth;
+        if ((aspectRatio * window.innerWidth) < window.innerHeight) {
+          scaledBGHeight = (unscaledBGHeight * window.innerWidth) / unscaledBGWidth;
+          scaledBGWidth = window.innerWidth;
+        }
+        else {
+          scaledBGHeight = window.innerHeight;
+          scaledBGWidth = (unscaledBGWidth * window.innerHeight) / unscaledBGHeight;
+        }
+        e.clientX;
+        e.clientY;
+        var xPosition = (e.clientX - (window.innerWidth/2 - scaledBGWidth/2)) * unscaledBGWidth / scaledBGWidth;
+        var yPosition = (e.clientY - (window.innerHeight/2 - scaledBGHeight/2)) * unscaledBGHeight / scaledBGHeight;
+
+
+        let coord = new XMLHttpRequest();
+        coord.open("POST", "/check", true);
+        coord.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+        coord.send("type=CLICK&x=" + xPosition + "&y=" + yPosition);
+        coord.onload = async function() {
+          const coordCheck = JSON.parse(coord.responseText);
+          if (coordCheck.state == "correct") {
+            clearTimeout(x);
+            clearInterval(timer);
+            winsound.play();
+            unscaledBG.removeEventListener("click", getClickPosition, false);
+            document.getElementById("menu-collapse").setAttribute('class', coordCheck.time);
+
+            let readyToMoveOn = false;
+            let myPromise = new Promise(function(resolve, reject) {
+              let congratsMessage = document.getElementById("congrats");
+              let pointsEarned = document.getElementById("points-earned");
+              let totalPoints = document.getElementById("total-points");
+
+              const jaosnImage = new Image();
+              jaosnImage.onload = function() {
+                var scaledBGHeight;
+                var scaledBGWidth;
+                if ((aspectRatio * window.innerWidth) < window.innerHeight) {
+                  scaledBGHeight = (unscaledBGHeight * window.innerWidth) / unscaledBGWidth;
+                  scaledBGWidth = window.innerWidth;
+                }
+                else {
+                  scaledBGHeight = window.innerHeight;
+                  scaledBGWidth = (unscaledBGWidth * window.innerHeight) / unscaledBGHeight;
+                }
+                var fixedX = ((coordCheck.left * scaledBGWidth) / unscaledBGWidth) + (window.innerWidth/2 - scaledBGWidth/2);
+                var fixedY = ((coordCheck.top * scaledBGHeight) / unscaledBGHeight) + (window.innerHeight/2 - scaledBGHeight/2);
+                var fixedHeight = ((coordCheck.height * scaledBGHeight) / unscaledBGHeight);
+                var fixedWidth = ((coordCheck.width * scaledBGWidth) / unscaledBGWidth);
+
+                jaosnImage.style.top = fixedY + "px";
+                jaosnImage.style.left = fixedX + "px";
+                jaosnImage.style.height = fixedHeight + "px";
+                jaosnImage.style.width = fixedWidth + "px";
+                jaosnImage.style.position = "fixed";
+
+                elem.appendChild(jaosnImage);
+
+                unscaledBG.style.transition = "0.25s";
+                unscaledBG.style.filter = "brightness(30%)";
+
+                let congratsPoints = document.getElementById("congrats-points");
+                congratsPoints.classList.toggle("visible");
+
+                let timeout1;
+                timeout1 = setTimeout(function(){
+                  jaosnImage.style.transition = "transform 1s";
+
+                  middlePosX = fixedX + (fixedWidth/2);
+                  translateX = (window.innerWidth/2) - middlePosX;
+                  translateY = (window.innerHeight/4.572) - (fixedY - window.innerHeight/4.572);
+                  jaosnImage.style.transform = "translate(" + translateX + "px, " + translateY + "px) scale(" + (window.innerHeight/2/fixedHeight) + ")";
+
+                  congratsMessage = document.getElementById("congrats");
+                  congratsMessage.style.top = Math.round(0.1*(window.innerHeight)) + "px";
+                  congratsMessage.style.transition = "opacity 1s";
+                  congratsMessage.style.opacity = "1.0";
+                }, 500);
+
+                let timeout2;
+                timeout2 = setTimeout(function(){
+                  let nextPointPromise = new Promise(function(resolve, reject) {
+                    let pointsToAdd = parseInt(coordCheck.points);
+
+                    pointsEarned.style.top = Math.round(0.71*(window.innerHeight)) + "px";
+                    pointsEarned.style.transition = "transform 1s, opacity 1s";
+                    pointsEarned.style.transform = "translate(0px, -20px)";
+                    pointsEarned.style.opacity = "1.0";
+
+                    if (pointsToAdd - 200 >= 0) {
+                      pointIncrementer(pointsToAdd, 200, pointsEarned, "Points Earned: ", 180, 20, 20);
+                    }
+                    else if (pointsToAdd - 20 >= 0) {
+                      pointIncrementer(pointsToAdd, pointsToAdd, pointsEarned, "Points Earned: ", pointsToAdd-20, 20, 20);
+                    }
+                    else if (pointsToAdd > 0) {
+                      pointIncrementer(0, 0, pointsEarned, "Points Earned: ", 0, 0, pointsToAdd);
+                    }
+                    else {
+                      pointsEarned.innerHTML = "Points Earned: 0";
+                    }
+                  });
+                }, 1500);
+
+                let timeout3;
+                timeout3 = setTimeout(function(){
+                  let pointsToAdd2 = parseInt(coordCheck.total);
+
+                  totalPoints.style.top = Math.round(0.74*(window.innerHeight)) + "px";
+                  totalPoints.style.transition = "transform 1s, opacity 1s";
+                  totalPoints.style.transform = "translate(0px, -20px)";
+                  totalPoints.style.opacity = "1.0";
+
+                  if (pointsToAdd2 - 200 >= 0) {
+                    pointIncrementer(pointsToAdd2, 200, totalPoints, "Total Points: ", 180, 20, 20);
+                  }
+                  else if (pointsToAdd2 - 20 >= 0) {
+                    pointIncrementer(pointsToAdd2, pointsToAdd2, totalPoints, "Total Points: ", pointsToAdd2-20, 20, 20);
+                  }
+                  else if (pointsToAdd2 > 0) {
+                    pointIncrementer(0, 0, totalPoints, "Total Points: ", 0, 0, pointsToAdd2);
+                  }
+                  else {
+                    totalPoints.innerHTML = "Total Points: 0";
+                  }
+                }, 3200);
+
+                pointNum = document.getElementById("point-counter");
+                pointNum.innerHTML = coordCheck.total;
+
+                let timeout4;
+                timeout4 = setTimeout(function(){
+                  congratsPoints.classList.toggle("visible");
+
+                  congratsMessage.style.opacity = "0.0";
+                  pointsEarned.style.opacity = "0.0";
+                  totalPoints.style.opacity = "0.0";
+
+                  pointsEarned.style.transform = "translate(0px, 20px)";
+                  totalPoints.style.transform = "translate(0px, 20px)";
+
+                  readyToMoveOn = true;
+                  if (readyToMoveOn) {
+                    resolve();
+                  }
+                }, 7000);
+              }
+              jaosnImage.src = "/static/jaosnTransparentBG.png";
+            });
+            myPromise.then(
+              async function() {
+                hex = await nextImageHex;
+                nextImagePrep(hex);
+              }
+            );
+          }
+          else if (coordCheck.state == "incorrect") {
+            if (coordCheck.lives == "0") {
+              clearInterval(timer);
+              clearTimeout(x);
+              heartAnimation(e.clientX, e.clientY);
+              var scaledBGHeight;
+              var scaledBGWidth;
+              if ((aspectRatio * window.innerWidth) < window.innerHeight) {
+                scaledBGHeight = (unscaledBGHeight * window.innerWidth) / unscaledBGWidth;
+                scaledBGWidth = window.innerWidth;
+              }
+              else {
+                scaledBGHeight = window.innerHeight;
+                scaledBGWidth = (unscaledBGWidth * window.innerHeight) / unscaledBGHeight;
+              }
+              var fixedX = ((coordCheck.left * scaledBGWidth) / unscaledBGWidth) + (window.innerWidth/2 - scaledBGWidth/2);
+              var fixedY = ((coordCheck.top * scaledBGHeight) / unscaledBGHeight) + (window.innerHeight/2 - scaledBGHeight/2);
+              var fixedHeight = ((coordCheck.height * scaledBGHeight) / unscaledBGHeight);
+              var fixedWidth = ((coordCheck.width * scaledBGWidth) / unscaledBGWidth);
+              unscaledBG.removeEventListener("click", getClickPosition, false);
+              gameOver(fixedX, fixedY, fixedHeight, fixedWidth, unscaledBG);
+            }
+            else {
+              heartAnimation(e.clientX, e.clientY);
+              document.getElementById("life-counter").src = "/static/" + coordCheck.lives + "lives.png";
+            }
+          }
+        };
+      }
+
+
+    }
+    unscaledBG.src = URL.createObjectURL(new Blob([decrypted], { type: 'image/jpeg' }));;
+  }
+
+  async function pointIncrementer(pta, min1, element, element_string, forLimit1, min2, forLimit2) {
+    currentPoint = pta - min1;
+    for (let i = 0; i <= forLimit1; ++i) {
+      pointtick.play();
+      element.innerHTML = element_string + (currentPoint + i).toString();
+      await sleep(1);
+    }
+    currentPoint = pta - min2;
+    for (let i=0; i <= forLimit2; ++i) {
+      pointtick.play();
+      element.innerHTML = element_string + (currentPoint + i).toString();
+      await sleep(25);
+    }
+  }
+
+  async function heartAnimation(x, y) {
+    loselifesound.play();
+    const newDiv = document.createElement("div");
+    newDiv.id = "animation";
+    newDiv.style.top = (y-30) + "px";
+    newDiv.style.left = (x-37) + "px";
+    newDiv.style.position = "fixed";
+    elem.appendChild(newDiv);
+    var xxx;
+    xxx = setTimeout(function(){
+      elem.removeChild(newDiv);
+    }, 1800);
+  }
+
+  function noSpacesCheck() {
+    var x;
+    x = document.getElementById("username-field").value;
+    for (i = 0; i < x.length; ++i) {
+      if (x.charAt(i) == " ") {
+        return false;
+      }
+    }
+    if (x.length == 0) {
+      return false;
+    }
+    return saveVolumeSettings();
+  }
+
+  async function gameOver(fixedX, fixedY, fixedHeight, fixedWidth, unscaledBG) {
+    end = true;
+    document.getElementById("menu-collapse").setAttribute('class', '0');
+    document.getElementById("life-counter").src = "/static/0lives.png";
+
+    const bg = document.getElementById("playscreen");
+
+    const jaosnImage = new Image();
+    jaosnImage.onload = async function() {
+      jaosnImage.style.top = fixedY + "px";
+      jaosnImage.style.left = fixedX + "px";
+      jaosnImage.style.height = fixedHeight + "px";
+      jaosnImage.style.width = fixedWidth + "px";
+      jaosnImage.style.position = "fixed";
+
+      bg.appendChild(jaosnImage);
+    }
+    jaosnImage.src = "/static/jaosnTransparentBG.png";
+    unscaledBG.style.transition = "0.25s";
+    unscaledBG.style.filter = "brightness(30%)";
+
+    await sleep(1500);
+
+    let random_num = Math.floor(Math.random() * 4) + 1;
+    const jaosnGO = document.getElementById("jaosngameover");
+    const final = document.getElementById("finalscore");
+    jaosnGO.src = "/static/jaosngameover" + random_num + ".jpg";
+    let finalScore = new XMLHttpRequest();
+    finalScore.open("GET", "/get-total-points", true);
+    finalScore.send();
+    finalScore.onload = function() {
+      final.innerHTML += " " + finalScore.responseText;
+    };
+
+    const submit = document.getElementById("submit-score");
+    submit.classList.toggle("visible");
+    await sleep(500);
+    submit.style.transition = "0.25s";
+    submit.style.filter = "brightness(100%)";
+  }
+
+  async function playBGMusicPlayer() {
+    goodtrack = false;
+    let randomTrack;
+    while (!goodtrack) {
+      randomTrack = Math.floor(Math.random() * 10) + 1;
+      if ( (randomTrack != track1ago) && (randomTrack != track2ago) ) {
+        track2ago = track1ago;
+        track1ago = randomTrack;
+        goodtrack = true;
+      }
+    }
+    bgmusic.src = "https://github.com/DED010/projectWJ/blob/main/track" + randomTrack + ".mp3?raw=true";
+    bgmusic.play();
+    bgmusic.onended = async function() {
+      if (!end) {
+        await sleep(1000);
+        playBGMusicPlayer();
+      }
+    };
+  }
+
+  function setBGVolume(val) {
+    bgmusic.volume = val / 100;
+  }
+
+  function setSFXVolume(val) {
+    countdowntick.volume = val / 100;
+    starttick.volume = val / 100;
+    winsound.volume = val / 100;
+    pointtick.volume = val / 100;
+    loselifesound.volume = val / 100;
+  }
+
+  function saveVolumeSettings() {
+    let sendVols = new XMLHttpRequest();
+    sendVols.open("POST", "/get-volume-states", true);
+    sendVols.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+    sendVols.send("current_bg_volume=" + (bgmusic.volume).toString() + "&current_sfx_volume=" + (countdowntick.volume).toString());
+    sendVols.onload = function() {
+      return true;
+    }
+  }
+
+  </script>
+  <script type="text/javascript" src="https://cdn.rawgit.com/ricmoo/aes-js/e27b99df/index.js"></script>
+{% endblock content %}

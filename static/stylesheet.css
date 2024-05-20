@@ -1,0 +1,493 @@
+/* --------------------------------HOME------------------------------------- */
+
+.banner img {
+  width: 100%;
+}
+
+.bgvideo video {
+  position: absolute;
+  opacity: 0.9;
+  top: 18%;
+}
+
+.selection-screen {
+  position: relative;
+  margin-top: 19%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.button {
+  background-color: black;
+  border-radius: 75px;
+  color: white;
+  border: 2px solid transparent;
+  display: block;
+  text-align: center;
+  font-family: "rooneysansregular";
+  text-decoration: none;
+  margin: 5px;
+}
+
+.button:hover {
+  border-color: black;
+  color: black;
+  background-color: white;
+  transition-duration: 0.25s;
+}
+
+.play-button {
+  padding: 30px;
+  font-size: 36px;
+  width: 250px;
+}
+
+.sub-button {
+  padding: 8px;
+  font-size: 18px;
+  width: 170px;
+}
+
+.creator-credit {
+  position: relative;
+  font-family: "rooneysansregular";
+  text-align: center;
+  color: black;
+}
+
+/* --------------------------------HOW TO PLAY------------------------------------- */
+
+.fullbg img {
+  display: flex;
+  position: fixed;
+  top: 0%;
+  height: 100%;
+  width: 100%;
+  flex-shrink: 0;
+}
+
+.main_HTP {
+  display: flex;
+  flex-direction: column;
+  position: absolute;
+  width: 100%;
+  top: 110px;
+}
+
+.title_jmh {
+  font-family: "jmhcromii";
+  font-size: 50px;
+  color: white;
+  text-align: center;
+}
+
+.contents {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  position: relative;
+  top: 20px;
+}
+
+/* Style the tab */
+.tab {
+  background-color: transparent;
+  /* border-radius: 75px; */
+  border: 2px solid white;
+  color: white;
+  text-align: center;
+  margin: none;
+  align-items: center;
+  font-family: "rooneysansregular";
+  text-decoration: none;
+  /* margin: 5px; */
+  /* padding: 30px; */
+  /* font-size:46px; */
+  /* width: 98%; */
+
+}
+
+/* Style the buttons inside the tab */
+.tab button {
+  color: white;
+  background-color: inherit;
+  float: center;
+  border: none;
+  outline: none;
+  cursor: pointer;
+  padding: 13px 10px;
+  transition: 0.3s;
+  font-size: 25px;
+}
+
+/* Change background color of buttons on hover */
+.tab button:hover {
+  background-color: white;
+  color: black;
+}
+
+/* Create an active/current tablink class */
+.tab button.active {
+  background-color: white;
+  color: black;
+}
+
+/* Style the tab content */
+.tabcontent {
+  display: none;
+  width: 96%;
+  padding-top: 30px;
+  padding-left: 20px;
+  padding-right: 20px;
+  border-radius: 5%;
+  font-family: "rooneysansregular";
+  border: 2px solid white;
+  color: white;
+}
+
+#howtoplayvidtext {
+  display: flex;
+  flex-direction: row;
+}
+
+#menubuttontext {
+  display: flex;
+  flex-direction: row;
+}
+
+/* --------------------------------LEADERBOARDS------------------------------------- */
+
+.main_LB {
+  display: flex;
+  flex-direction: column;
+  position: absolute;
+  align-items: center;
+  width: 100%;
+  top: 110px;
+}
+
+.page_bar {
+  display: flex;
+  flex-direction: row;
+  position: absolute;
+  color: white;
+  font-size: 25px;
+  font-family: "rooneysansregular";
+  top: 163px;
+  z-index: 2;
+}
+
+#prev_page, #next_page, #page_num {
+  margin-left: 10px;
+}
+
+#prev_page, #next_page {
+  text-decoration: underline;
+}
+
+#prev_page:hover {
+  cursor: default;
+}
+
+#next_page:hover {
+  cursor: pointer;
+}
+
+.leaderboard_table {
+  position: relative;
+  top: 20px;
+}
+
+.leaderboard_head {
+  display: flex;
+  flex-direction: row;
+  font-size: 30px;
+  color: white;
+}
+
+.leaderboard_box {
+  border: 2px solid white;
+}
+
+.leaderboard_head_box {
+  font-family: "jmhcromii";
+}
+
+.leaderboard_contents {
+  display: flex;
+  flex-direction: row;
+  font-size: 30px;
+  color: white;
+}
+
+.leaderboard_contents_box {
+  font-family: "pressstart2p";
+  text-align: center;
+  padding-top: 23px;
+  padding-bottom: 0px;
+  line-height: 37px;
+}
+
+.back-button {
+  position: absolute;
+  background-color: transparent;
+  padding: 15px;
+  font-size: 22px;
+  border-radius: 75px;
+  color: white;
+  border: 2px solid white;
+  text-align: center;
+  font-family: "jmhcromii";
+  text-decoration: none;
+}
+
+/* --------------------------------PLAY------------------------------------- */
+
+.play-screen {
+  font-family: "jmhcromii";
+  font-size: 82px;
+  color: white;
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background-color: black;
+  width: 100%;
+}
+
+.start-button {
+  position: absolute;
+  background-color: transparent;
+  padding: 25px;
+  font-size: 62px;
+  width: 500px;
+  border-radius: 75px;
+  color: white;
+  border: 2px solid white;
+  text-align: center;
+  align-items: center;
+  font-family: "jmhcromii";
+  text-decoration: none;
+}
+
+.start-button:hover {
+  background-color: white;
+  color: black;
+  border: 2px solid white;
+  transition-duration: 0.3s;
+}
+
+#menu {
+  position: fixed;
+  top: 0px;
+  left: 0px;
+  width: 100%;
+  transform: translateY(calc(-100% + 31px));
+  transition: transform 0.2s ease-in-out;
+  visibility: hidden;
+}
+
+#menu.visible {
+  visibility: visible;
+}
+
+#menu.active {
+  transform: translateY(0);
+}
+
+#menu-content {
+  background-color: black;
+  border-bottom: 2px solid white;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+#menu #menu-collapse {
+  border-radius: 25%;
+  background-color: black;
+  border-color: white;
+  color: white;
+  position: relative;
+  left: 50%;
+  top: 0px;
+  transform: translateX(-50%);
+  text-decoration: none;
+  font-size: 20px;
+  font-family: "pressstart2p";
+}
+
+#menu-collapse {
+  border: 2px solid white;
+}
+
+#menu #menu-collapse::after {
+  content: attr(class);
+}
+
+#menu.active #menu-collapse::after {
+  content: "\25B2";
+}
+
+#leftside {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+}
+
+#firstvol, #secondvol {
+  display: flex;
+  flex-direction: column;
+  font-family: "jmhcromii";
+  color: white;
+  align-items: center;
+}
+
+#rightside {
+  color: white;
+  font-size: 35px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
+}
+
+.back-home {
+  /* position: absolute; */
+  background-color: transparent;
+  padding: 11px;
+  font-size: 18px;
+  color: white;
+  border: 2px solid white;
+  text-align: center;
+  font-family: "jmhcromii";
+  text-decoration: none;
+}
+
+.back-home:hover {
+  border: 2px solid transparent
+}
+
+#point-counter {
+  font-family: "pressstart2p";
+  color: white;
+  font-size: 35px;
+}
+
+#animation {
+  width: 74px;
+  height: 60px;
+  background: url("/static/loselifesprite.png") left center;
+  background-size: cover;
+  animation: play 1.8s steps(18) infinite;
+}
+
+#congrats-points {
+  position: fixed;
+  font-family: "pressstart2p";
+  display: none;
+  flex-direction: column;
+  visibility: hidden;
+  width: 100%;
+  color: white;
+}
+
+#congrats-points.visible {
+  visibility: visible;
+}
+
+#congrats {
+  position: relative;
+  font-size: 45px;
+  text-align: center;
+  opacity: 0.0;
+}
+
+#points-earned {
+  position: relative;
+  text-align: center;
+  font-size: 30px;
+  opacity: 0.0;
+}
+
+#total-points {
+  position: relative;
+  text-align: center;
+  font-size: 30px;
+  opacity: 0.0;
+}
+
+#submit-score {
+  position: relative;
+  font-family: "pressstart2p";
+  display: none;
+  flex-direction: column;
+  visibility: hidden;
+  align-items: center;
+  filter: brightness(0%);
+  align-items: center;
+  text-align: center;
+  color: white;
+  z-index: 2;
+  border-radius: 25px;
+  /* border: 2px solid white; */
+  /* background-color: rgba(255,255,255,0.5); */
+}
+
+#submit-score.visible {
+  visibility: visible;
+}
+
+#jaosngameover {
+  padding-top: 30px;
+}
+
+#blnt {
+  padding-top: 30px;
+}
+
+#userheader {
+  padding-top: 30px;
+}
+
+#username {
+  margin-top: 10px;
+}
+
+#submitusername {
+  width: 80%;
+  margin-top: 10px;
+}
+
+
+
+@keyframes play {
+  100% { background-position: -1332px; }
+}
+
+@font-face {
+  font-family: 'rooneysansregular';
+  src: url('rooneysansregular-webfont.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+    font-family: 'jmhcromii';
+    src: url('JMHCromII-Regular.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'pressstart2p';
+    src: url('PressStart2P.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}

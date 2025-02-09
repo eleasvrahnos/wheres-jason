@@ -7,9 +7,7 @@
 
 
 # Imports for basic Flask application, including website sessions per user, rendering templates of websites, and link redirections
-from flask import Flask, render_template, url_for, request, session, redirect
-# Import for getting URL link data, in this case it is used for getting the GitHub picture to use
-import requests
+from flask import Flask, render_template, request, session, redirect
 # Import for operating on the random image, including opening, pastes, and resizing
 from PIL import Image
 # Import for converting image data to a byte stream
@@ -23,11 +21,11 @@ import json
 # Import for rounding data
 import math
 # Import for encrypting image data with AES encryption
-from Crypto.Cipher import AES
+from Cryptodome.Cipher import AES
 # Import for padding image data with null bytes for decoding
-from Crypto.Util.Padding import pad
+from Cryptodome.Util.Padding import pad
 # Import for randomizing key for decrypting image data
-from Crypto.Random import get_random_bytes
+from Cryptodome.Random import get_random_bytes
 # Import for setting up the leaderboard database, using SQLAlchemy
 from flask_sqlalchemy import SQLAlchemy
 
@@ -80,9 +78,8 @@ def get_image():
     # Randomly picks a picture to use out of the possible images on the GitHub repository
     num_pics_available = 171 # Number of pictures on GitHub repository
     pic_to_use = random.randint(1, num_pics_available)
-    url = 'https://github.com/DED010/projectWJ/blob/main/' + str(pic_to_use) + '.jpg?raw=true'
     # Opens both background image and standard Jaosn image
-    background_image = Image.open(requests.get(url, stream=True).raw)
+    background_image = Image.open('static/projectWJ/' + str(pic_to_use) + '.jpg')
     jaosn_image = Image.open('static/jaosnTransparentBG.png')
     # Randomly gives Jaosn a size to scale down to, based on background image height
     bg_width, bg_height = background_image.size
